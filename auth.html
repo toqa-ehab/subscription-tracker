@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register - SubTrackr</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .toggle a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginPage">
+            <h2>Login to SubTrackr</h2>
+            <div id="loginMsg" class="message hidden"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPass">
+            </div>
+            <button id="loginBtn" onclick="login()">Login</button>
+            <div class="toggle">
+                Don't have an account? <a onclick="showRegister()">Register</a>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerPage" class="hidden">
+            <h2>Register for SubTrackr</h2>
+            <div id="registerMsg" class="message hidden"></div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="registerName">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="registerEmail">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="registerPass">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="registerConfirm">
+            </div>
+            <button id="registerBtn" onclick="register()">Register</button>
+            <div class="toggle">
+                Have an account? <a onclick="showLogin()">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration - json-server base users endpoint
+        var API_URL = 'http://localhost:3001/users';
+
+        // Show/Hide pages
+        function showLogin() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            hideMessages();
+        }
+
+        function showRegister() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+            hideMessages();
+        }
+
+        // Show message
+        function showMsg(id, text, type) {
+            var msg = document.getElementById(id);
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+        }
+
+        function hideMessages() {
+            var msgs = document.querySelectorAll('.message');
+            for (var i = 0; i < msgs.length; i++) {
+                msgs[i].className = 'message hidden';
+            }
+        }
+
+        // Set button loading state
+        function setLoading(btnId, isLoading) {
+            var btn = document.getElementById(btnId);
+            if (isLoading) {
+                btn.disabled = true;
+                var btnText = btn.textContent;
+                btn.setAttribute('data-text', btnText);
+                btn.innerHTML = btnText + '<span class="loading"></span>';
+            } else {
+                btn.disabled = false;
+                var btnText = btn.getAttribute('data-text');
+                btn.textContent = btnText || 'Submit';
+            }
+        }
+
+        // Register function with API
+        function register() {
+            var name = document.getElementById('registerName').value;
+            var email = document.getElementById('registerEmail').value;
+            var pass = document.getElementById('registerPass').value;
+            var confirm = document.getElementById('registerConfirm').value;
+
+            // Validation
+            if (name === '' || email === '' || pass === '' || confirm === '') {
+                showMsg('registerMsg', 'Please fill all fields', 'error');
+                return;
+            }
+
+            if (pass.length < 6) {
+                showMsg('registerMsg', 'Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (pass !== confirm) {
+                showMsg('registerMsg', 'Passwords do not match', 'error');
+                return;
+            }
+
+            // Show loading
+            setLoading('registerBtn', true);
+
+            // Call Register API (json-server: POST /users)
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', API_URL, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function() {
+                setLoading('registerBtn', false);
+                
+                if (xhr.status === 200 || xhr.status === 201) {
+                    var response = {};
+                    try {
+                        response = JSON.parse(xhr.responseText || '{}');
+                    } catch (e) {}
+                    
+                    // Store user data locally 
+                    var userData = {
+                        id: response.id || Date.now(),
+                        token: btoa(email + ':' + Date.now()),
+                        name: response.name || name,
+                        email: response.email || email
+                    };
+                    localStorage.setItem('userData', JSON.stringify(userData));
+
+                    showMsg('registerMsg', 'Registration successful!', 'success');
+                    
+                    // Clear form
+                    document.getElementById('registerName').value = '';
+                    document.getElementById('registerEmail').value = '';
+                    document.getElementById('registerPass').value = '';
+                    document.getElementById('registerConfirm').value = '';
+
+                    // Redirect to login
+                    setTimeout(function() {
+                        showLogin();
+                        showMsg('loginMsg', 'Please login with your credentials', 'success');
+                    }, 1500);
+                } 
+                else {
+                    var error = {};
+                    try {
+                        error = JSON.parse(xhr.responseText || '{}');
+                    } catch (e) {}
+                    showMsg('registerMsg', error.error || 'Registration failed', 'error');
+                }
+            };
+
+            xhr.onerror = function() {
+                setLoading('registerBtn', false);
+                showMsg('registerMsg', 'Network error. Please try again.', 'error');
+            };
+
+            xhr.send(JSON.stringify({
+                email: email,
+                password: pass,
+                name: name,
+                username: name
+            }));
+        }
+
+        // Login function with API
+        function login() {
+            var email = document.getElementById('loginEmail').value;
+            var pass = document.getElementById('loginPass').value;
+
+            // Validation
+            if (email === '' || pass === '') {
+                showMsg('loginMsg', 'Please fill all fields', 'error');
+                return;
+            }
+
+            // Show loading
+            setLoading('loginBtn', true);
+
+            // Call Login API 
+            var xhr = new XMLHttpRequest();
+            var query = '?email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(pass);
+            xhr.open('GET', API_URL + query, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function() {
+                setLoading('loginBtn', false);
+                
+                if (xhr.status === 200) {
+                    var users = [];
+                    try {
+                        users = JSON.parse(xhr.responseText || '[]');
+                    } catch (e) {}
+
+                    if (Array.isArray(users) && users.length > 0) {
+                        var user = users[0];
+
+                        // Build user data
+                        var userData = {
+                            id: user.id || Date.now(),
+                            name: user.name || user.username || 'User',
+                            email: user.email || email,
+                            token: btoa((user.email || email) + ':' + Date.now())
+                        };
+                        
+                        // Save login state
+                        localStorage.setItem('loggedIn', 'true');
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+
+                        showMsg('loginMsg', 'Login successful!', 'success');
+
+                        // Clear form
+                        document.getElementById('loginEmail').value = '';
+                        document.getElementById('loginPass').value = '';
+
+                        // Redirect to main app
+                        setTimeout(function() {
+                            window.location.href = 'index.html';
+                        }, 500);
+                    } else {
+                        showMsg('loginMsg', 'Invalid credentials', 'error');
+                    }
+                } else {
+                    var error = {};
+                    try {
+                        error = JSON.parse(xhr.responseText || '{}');
+                    } catch (e) {}
+                    showMsg('loginMsg', error.error || 'Login failed', 'error');
+                }
+            };
+
+            xhr.onerror = function() {
+                setLoading('loginBtn', false);
+                showMsg('loginMsg', 'Network error. Please try again.', 'error');
+            };
+
+            // For json-server login we use GET params, so no body is needed
+            xhr.send();
+        }
+
+        // Handle Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (!document.getElementById('loginPage').classList.contains('hidden')) {
+                    login();
+                } else if (!document.getElementById('registerPage').classList.contains('hidden')) {
+                    register();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
+

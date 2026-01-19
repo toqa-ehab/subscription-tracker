@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>
+      // Redirect to login if not logged in
+      if (!localStorage.getItem("loggedIn")) {
+        window.location.href = "auth.html";
+      }
+    </script>
+
+    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SubTrackr</title>
+
+    <!-- FONT AWESOME -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-actions">
+          <!-- Only Dark Mode Toggle -->
+          <button
+            class="theme-toggle-btn"
+            id="theme-toggle"
+            title="Toggle dark mode"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+
+          <!-- Logout Button -->
+          <button class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+
+        <h1><i class="fas fa-receipt"></i> SubTrackr</h1>
+        <p>
+          Manage your monthly subscriptions, get reminders and track expenses
+        </p>
+      </header>
+
+      <!-- Dashboard -->
+      <div class="dashboard">
+        <!-- Add Sub Form -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-plus-circle"></i> Add New Subscription</h2>
+          </div>
+
+          <form id="subscription-form">
+            <div class="form-group">
+              <label for="sub-category">Service</label>
+              <select id="sub-category" class="form-control" required>
+                <option value="">Select</option>
+                <option value="Netflix">Netflix</option>
+                <option value="Spotify">Spotify</option>
+                <option value="Watchit">Watchit</option>
+                <option value="Shahid">Shahid</option>
+                <option value="Anghami">Anghami</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="sub-price">Monthly Price</label>
+                <input
+                  type="number"
+                  id="sub-price"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="sub-date">Renewal Date</label>
+                <input
+                  type="date"
+                  id="sub-date"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="sub-method">Payment Method</label>
+              <select id="sub-method" class="form-control" required>
+                <option value="">Select</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="PayPal">PayPal</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Save
+            </button>
+          </form>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="stats-card">
+          <h2><i class="fas fa-chart-line"></i> Monthly Overview</h2>
+          <div id="total-amount" class="total-amount">$0.00</div>
+          <div id="subscription-count" class="subscription-count">
+            0 subscriptions
+          </div>
+
+          <div
+            style="
+              margin-top: 30px;
+              display: flex;
+              gap: 20px;
+              justify-content: center;
+            "
+          >
+            <div>
+              <strong>Expiring Soon</strong>
+              <div id="expiring-count">0</div>
+            </div>
+
+            <div>
+              <strong>Expired</strong>
+              <div id="expired-count">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription List -->
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-list"></i> My Subscriptions</h2>
+          <button id="clear-all" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Clear All
+          </button>
+        </div>
+
+        <div class="subscription-list" id="subscription-list">
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No Subscriptions Yet</h3>
+          </div>
+        </div>
+      </div>
+
+      <footer>Subscription Tracker © 2025</footer>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+      <i class="fas fa-bell"></i>
+      <div id="notification-text"></div>
+    </div>
+
+    <script>
+      // Grab elements
+      const form = document.getElementById("subscription-form");
+      const list = document.getElementById("subscription-list");
+      const totalAmountEl = document.getElementById("total-amount");
+      const subCountEl = document.getElementById("subscription-count");
+      const expiringEl = document.getElementById("expiring-count");
+      const expiredEl = document.getElementById("expired-count");
+      const clearAllBtn = document.getElementById("clear-all");
+
+      // Load subscriptions from localStorage
+      let subscriptions =
+        JSON.parse(localStorage.getItem("subscriptions")) || [];
+
+      // Helper to display subscriptions
+      function renderSubscriptions() {
+        list.innerHTML = "";
+        if (subscriptions.length === 0) {
+          list.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h3>No Subscriptions Yet</h3>
+            </div>`;
+          totalAmountEl.textContent = "$0.00";
+          subCountEl.textContent = "0 subscriptions";
+          expiringEl.textContent = "0";
+          expiredEl.textContent = "0";
+          return;
+        }
+
+        let total = 0;
+        let expiring = 0;
+        let expired = 0;
+        const today = new Date();
+
+        subscriptions.forEach((sub, index) => {
+          const renewDate = new Date(sub.date);
+          total += parseFloat(sub.price || 0);
+
+          // Calculate expiring / expired
+          const diffDays = Math.floor(
+            (renewDate - today) / (1000 * 60 * 60 * 24)
+          );
+          if (diffDays < 0) expired++;
+          else if (diffDays <= 7) expiring++;
+
+          const item = document.createElement("div");
+          item.className = "subscription-item";
+          item.innerHTML = `
+            <div>
+                <strong>${sub.category}</strong> - $${sub.price} / ${sub.method} - ${sub.date}
+            </div>
+            <button class="btn btn-danger" onclick="deleteSub(${index})">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+          list.appendChild(item);
+        });
+
+        totalAmountEl.textContent = `$${total.toFixed(2)}`;
+        subCountEl.textContent = `${subscriptions.length} subscriptions`;
+        expiringEl.textContent = expiring;
+        expiredEl.textContent = expired;
+      }
+
+      // Add subscription
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const sub = {
+          category: document.getElementById("sub-category").value,
+          price: document.getElementById("sub-price").value,
+          date: document.getElementById("sub-date").value,
+          method: document.getElementById("sub-method").value,
+        };
+        subscriptions.push(sub);
+        localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
+        form.reset();
+        renderSubscriptions();
+      });
+
+      // Delete subscription
+      function deleteSub(index) {
+        subscriptions.splice(index, 1);
+        localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
+        renderSubscriptions();
+      }
+
+      // Clear all
+      clearAllBtn.addEventListener("click", () => {
+        subscriptions = [];
+        localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
+        renderSubscriptions();
+      });
+
+      // Initial render
+      renderSubscriptions();
+
+      // Logout function
+      function logout() {
+        localStorage.removeItem("loggedIn");
+        window.location.href = "auth.html";
+      }
+
+      // Dark mode toggle
+      const html = document.documentElement;
+      const themeToggle = document.getElementById("theme-toggle");
+      const icon = themeToggle.querySelector("i");
+
+      const savedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+
+      if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+        html.classList.add("dark-mode");
+        icon.className = "fas fa-sun";
+      } else {
+        icon.className = "fas fa-moon";
+      }
+
+      themeToggle.addEventListener("click", () => {
+        html.classList.toggle("dark-mode");
+        const isDark = html.classList.contains("dark-mode");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+        icon.className = isDark ? "fas fa-sun" : "fas fa-moon";
+      });
+    </script>
+  </body>
+</html>

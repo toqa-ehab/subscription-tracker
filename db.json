@@ -1,0 +1,64 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "toqa",
+      "email": "toqa@gmail.com",
+      "password": "1234"
+    },
+    {
+      "id": "2",
+      "username": "admin",
+      "email": "admin@gmail.com",
+      "password": "admin123"
+    },
+    {
+      "id": "3e23",
+      "email": "maroco@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "name": "Kylee Bowers",
+      "username": "Kylee Bowers"
+    },
+    {
+      "id": "71b7",
+      "email": "gyqu@mailinator.com",
+      "password": "Pa$$w0rd!",
+      "name": "Summer Campos",
+      "username": "Summer Campos"
+    },
+    {
+      "id": "1403",
+      "email": "toqa@gmail.com",
+      "password": "1234"
+    },
+    {
+      "id": "ea65",
+      "email": "toqa@gmail.com",
+      "password": "1234"
+    },
+    {
+      "id": "514b",
+      "email": "gyqu@mailinator.com",
+      "password": "Pa$$w0rd!"
+    },
+    {
+      "id": "11a2",
+      "email": "gyqu@mailinator.com",
+      "password": "Pa$$w0rd!"
+    },
+    {
+      "id": "4fa7",
+      "email": "mariam@gmail.com",
+      "password": "123456",
+      "name": "mairam",
+      "username": "mairam"
+    },
+    {
+      "id": "f918",
+      "email": "haydy@gmail.come",
+      "password": "123456",
+      "name": "haydy",
+      "username": "haydy"
+    }
+  ]
+}

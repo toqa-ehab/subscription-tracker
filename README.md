@@ -23,8 +23,7 @@ Middleware: CORS, JSON Body Parser.
 
 Storage: In-memory User Map (Production-ready for DB integration).
 
-##⚡ Quick Start
-
+## ⚡ Quick Start
 1.Clone the repo
 
 

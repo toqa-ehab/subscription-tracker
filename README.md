@@ -1,9 +1,9 @@
-## 🚀 SubTrackr: Simple & Sleek Auth
+# 🚀 SubTrackr: Simple & Sleek Auth
 SubTrackr is a lightweight, full-stack authentication gateway designed for subscription management. It combines a high-performance Node.js backend with a buttery-smooth, gradient-powered frontend.
 
 No bloat. No complex frameworks. Just clean, functional code.
 
-# ✨ Features
+## ✨ Features
 Modern UI/UX: Responsive design featuring smooth transitions and a premium aesthetic.
 
 Live Feedback: Real-time validation for password matching, length requirements, and error handling.
@@ -14,7 +14,7 @@ RESTful API: A robust Express backend with dedicated endpoints for user registra
 
 Persistent Login: Uses localStorage and token simulation to keep users signed in across sessions.
 
-# 🛠️ Tech Stack
+## 🛠️ Tech Stack
 Frontend: HTML5, CSS3 (Flexbox & Animations), Vanilla JavaScript.
 
 Backend: Node.js, Express.js.
@@ -23,7 +23,8 @@ Middleware: CORS, JSON Body Parser.
 
 Storage: In-memory User Map (Production-ready for DB integration).
 
-#⚡ Quick Start
+##⚡ Quick Start
+
 1.Clone the repo
 
 

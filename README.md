@@ -21,36 +21,36 @@ Dark Mode Toggle with persistent theme state
 JSON-based Mock Backend using json-server
 
 ## 🛠️ Tech Stack
-Frontend:
+### Frontend:
 
-HTML5
+  HTML5
 
-CSS3 (Flexbox, Animations, Dark Mode)
+  CSS3 (Flexbox, Animations, Dark Mode)
 
-Vanilla JavaScript
+  Vanilla JavaScript
 
-XMLHttpRequest (AJAX)
+  XMLHttpRequest (AJAX)
 
-Backend (Mock API):
+### Backend (Mock API):
 
-json-server
+  json-server
 
-RESTful endpoints
+  RESTful endpoints
 
-JSON-based storage
+  JSON-based storage
 
 ## ⚡ Quick Start
-1.Clone the repo
+### 1.Clone the repo
 
 
 git clone https://github.com/yourusername/subtrackr-auth.git
 
-2.Install dependencies
+### 2.Install dependencies
 
 
 npm install
 
-3.Launch the server
+### 3.Launch the server
 
 
 node server.js

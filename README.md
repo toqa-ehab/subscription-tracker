@@ -55,4 +55,4 @@ npm install
 
 node server.js
 
-4.Open the App Simply open index.html in your browser and start tracking!
+### 4.Open the App Simply open index.html in your browser and start tracking!

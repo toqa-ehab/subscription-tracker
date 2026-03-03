@@ -1,27 +1,43 @@
-# 🚀 SubTrackr: Simple & Sleek Auth
-SubTrackr is a lightweight, full-stack authentication gateway designed for subscription management. It combines a high-performance Node.js backend with a buttery-smooth, gradient-powered frontend.
+# 🚀 SubTrackr: Subscription Tracker with Authentication Workflow
+SubTrackr is a lightweight full-stack subscription tracking application featuring a client-side authentication workflow and REST API integration using a mock backend.
 
-No bloat. No complex frameworks. Just clean, functional code.
+It demonstrates user registration, login validation, session persistence, and dynamic UI state management without external frameworks.
+
+Clean architecture. Functional design. No unnecessary complexity.
 
 ## ✨ Features
-Modern UI/UX: Responsive design featuring smooth transitions and a premium aesthetic.
+Client-Server Authentication Flow using REST API calls (GET & POST)
 
-Live Feedback: Real-time validation for password matching, length requirements, and error handling.
+Real-Time Form Validation (password matching, length validation)
 
-Smart State Management: Toggles between Login and Register views without a single page refresh.
+Dynamic UI Rendering without page reloads
 
-RESTful API: A robust Express backend with dedicated endpoints for user registration and session verification.
+Session Persistence using localStorage
 
-Persistent Login: Uses localStorage and token simulation to keep users signed in across sessions.
+Subscription Management Dashboard with renewal tracking
+
+Dark Mode Toggle with persistent theme state
+
+JSON-based Mock Backend using json-server
 
 ## 🛠️ Tech Stack
-Frontend: HTML5, CSS3 (Flexbox & Animations), Vanilla JavaScript.
+Frontend:
 
-Backend: Node.js, Express.js.
+HTML5
 
-Middleware: CORS, JSON Body Parser.
+CSS3 (Flexbox, Animations, Dark Mode)
 
-Storage: In-memory User Map (Production-ready for DB integration).
+Vanilla JavaScript
+
+XMLHttpRequest (AJAX)
+
+Backend (Mock API):
+
+json-server
+
+RESTful endpoints
+
+JSON-based storage
 
 ## ⚡ Quick Start
 1.Clone the repo
